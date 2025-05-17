@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 const FrontPage = () => {
     return(
         <>
             <h1>FrontPage</h1>
-            <Link to="/login">Login</Link>
+            <Link to="/login">Log in</Link>
+
         </>
     );
 }
