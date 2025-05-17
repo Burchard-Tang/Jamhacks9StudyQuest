@@ -1,38 +1,155 @@
-/* src/pages/Dashboard.css */
-
 .dashboard {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   padding: 2rem;
-  font-family: Arial, sans-serif;
-  color: #333;
+  font-family: 'Georgia', serif;
+  color: #3B2F2F; /* warm dark brown */
+  background-color: #FDF6E3; /* parchment */
 }
 
 .school-status {
-  background-color: #f0f8ff;
-  padding: 1rem;
-  margin-bottom: 2rem;
-  border-left: 5px solid #007acc;
-  border-radius: 8px;
+  background-color: #FFF5DC; /* soft ivory */
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  border-left: 6px solid #D65A31; /* burnt orange */
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(55, 49, 49, 0.1);
+}
+
+.school-status h2 {
+  margin-top: 0;
+  font-size: 1.7rem;
+  color: #3B2F2F;
 }
 
 .school-tier {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: #007acc;
+  color: #D65A31;
+  margin-top: 0.5rem;
+  text-shadow: 1px 1px 0 #FDF6E3;
 }
 
 .chapters {
-  background-color: #fff0f5;
-  padding: 1rem;
-  border-radius: 8px;
-  border-left: 5px solid #cc3366;
+  background-color: #FAE8D9; /* very soft orange-pink */
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 6px solid #8C7B6B;
+  box-shadow: 0 2px 5px rgba(55, 49, 49, 0.05);
+}
+
+.chapters h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #3B2F2F;
 }
 
 .chapter-list {
-  padding-left: 1.5rem;
+  padding-left: 1.8rem;
 }
 
 .chapter {
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  background-color: #FDF6E3;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px dashed #D65A31;
+  box-shadow: inset 0 0 5px rgba(214, 90, 49, 0.1);
+  transition: background-color 0.3s ease;
+  height: 350px;
 }
+
+.chapter:hover {
+  background-color: #FFF8EE;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.chapter-nav button {
+  background-color: #D65A31;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.chapter-nav button:hover:enabled {
+  background-color: #b84c28;
+}
+
+.chapter-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.chapter-counter {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3B2F2F;
+}
+
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.side-panel {
+  width: 200px;
+  background-color: #3B2F2F;
+  color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  height: fit-content;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  font-family: 'Georgia', serif;
+}
+
+.left-panel .avatar-box {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.avatar-label {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.avatar-university {
+  margin-top: 0.25rem;
+  font-style: italic;
+  font-size: 1rem;
+  color: #FFD700;
+}
+
+.right-panel .narrator-box {
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  border-left: 3px solid #D65A31;
+  padding-left: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .side-panel {
+    width: 90%;
+  }
+}
+
