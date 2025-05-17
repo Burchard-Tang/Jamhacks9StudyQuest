@@ -98,7 +98,6 @@ app.post('/verifyuser', (req, res) => {
         if (rows.length === 0) return res.status(401).json({ success: false, message: "Invalid credentials" });
 
         const user = rows[0];
-        // For demo, compare plain text (replace with hash check in production)
         if (password === user.password_hash) {
             delete user.password_hash;
             return res.json({ success: true, user });
@@ -114,7 +113,7 @@ app.put('/create', (req, res) => {
         return res.status(400).json({ success: false, message: "Missing username or password" });
     }
     const sql = 'INSERT INTO users (username, password_hash, current_university, group_id) VALUES (?, ?, ?, ?)';
-    db.query(sql, [username, password, 1, null], (err, result) => {
+    db.query(sql, [username, password, 6, null], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.json({ success: false, message: "Username already exists" });
@@ -128,6 +127,7 @@ app.put('/create', (req, res) => {
 
 app.post('/creategroup', (req, res) => {
     const { groupName } = req.body;
+    console.log('Received groupName:', groupName); // This is fine here
     if (!groupName || !groupName.trim()) {
         return res.status(400).json({ success: false, message: "Group name required" });
     }
@@ -136,7 +136,7 @@ app.post('/creategroup', (req, res) => {
 
     db.query(sql, [groupName, joinCode], (err, result) => {
         if (err) {
-            console.log('Group creation error:', err);
+            console.log('Group creation error:', err); // <-- Only here!
             return res.status(500).json({ success: false, message: "Group creation failed" });
         }
         return res.json({ success: true, groupId: result.insertId, joinCode });
@@ -145,17 +145,24 @@ app.post('/creategroup', (req, res) => {
 
 app.post('/joingroup', (req, res) => {
     const { userId, joinCode } = req.body;
+    console.log('Joining group:', { userId, joinCode });
 
     const getGroupSql = 'SELECT group_id FROM groups WHERE join_code = ?';
     db.query(getGroupSql, [joinCode], (err, rows) => {
-        if (err || rows.length === 0) {
+        if (err || rows.length == 0) {
+            console.log('Invalid join code or SQL error:', err);
             return res.status(400).json({ success: false, message: "Invalid join code" });
         }
 
         const groupId = rows[0].group_id;
+        console.log('Found groupId:', groupId);
         const updateUserSql = 'UPDATE users SET group_id = ? WHERE user_id = ?';
-        db.query(updateUserSql, [groupId, userId], (err) => {
-            if (err) return res.status(500).json({ success: false, message: "Join group failed" });
+        db.query(updateUserSql, [groupId, userId], (err, result) => {
+            if (err) {
+                console.log('Failed to update user:', err);
+                return res.status(500).json({ success: false, message: "Join group failed" });
+            }
+            console.log('User updated:', result); // <-- Look for affectedRows: 1
             return res.json({ success: true, groupId });
         });
     });
@@ -163,16 +170,52 @@ app.post('/joingroup', (req, res) => {
 
 app.get('/grouprankings', (req, res) => {
     const sql = `
-        SELECT g.group_name, g.group_id, AVG(u.current_university) as avg_university_tier
-        FROM groups g
-        JOIN users u ON g.group_id = u.group_id
-        GROUP BY g.group_id
-        ORDER BY avg_university_tier ASC
+        SELECT u.username, u.current_university, g.group_name, g.group_id
+        FROM users u
+        LEFT JOIN groups g ON u.group_id = g.group_id
+        ORDER BY u.current_university ASC
     `;
-
     db.query(sql, (err, rows) => {
         if (err) return res.status(500).json({ success: false });
         return res.json({ success: true, rankings: rows });
+    });
+});
+
+app.get('/group/:id', (req, res) => {
+    const groupId = req.params.id;
+    const sql = 'SELECT * FROM groups WHERE group_id = ?';
+    db.query(sql, [groupId], (err, rows) => {
+        if (err) return res.status(500).json({ success: false, message: "Database error" });
+        if (rows.length === 0) return res.status(404).json({ success: false, message: "Group not found" });
+        return res.json({ success: true, group: rows[0] });
+    });
+});
+
+app.get('/group/:id/users', (req, res) => {
+    const { groupId } = req.body;
+    const sql = `
+        SELECT user_id, username, current_university
+        FROM users
+        WHERE group_id = ?
+        ORDER BY current_university ASC
+    `;
+    db.query(sql, [groupId], (err, rows) => {
+        if (err) return res.status(500).json({ success: false, message: "Database error" });
+        return res.json({ success: true, users: rows });
+    });
+});
+
+app.get('/users', (req, res) => {
+    const sql = `
+        SELECT u.username, u.current_university, g.group_name, g.group_id
+        FROM users u
+        LEFT JOIN groups g ON u.group_id = g.group_id
+        ORDER BY u.current_university ASC
+    `;
+
+    db.query(sql, (err, rows) => {
+        if (err) return res.status(500).json({ success: false, message: "Database error" });
+        return res.json({ success: true, users: rows });
     });
 });
 

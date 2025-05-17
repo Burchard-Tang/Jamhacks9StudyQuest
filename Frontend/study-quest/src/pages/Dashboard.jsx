@@ -19,12 +19,13 @@ const Dashboard = () => {
   const [currentUniversity, setCurrentUniversity] = useState('UofT');
 
   useEffect(() => {
-    // Load chapters from localStorage
-    const stored = JSON.parse(localStorage.getItem('studyChapters')) || [];
-    setChapters(stored);
+    // Load user object from localStorage
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const chaptersArr = Array.isArray(user.chapters) ? user.chapters : [];
+    setChapters(chaptersArr);
 
     // Simulate university based on chapter count and success
-    const netScore = stored.reduce((acc, ch) => acc + (ch.success ? 1 : -1), 0);
+    const netScore = chaptersArr.reduce((acc, ch) => acc + (ch.success ? 1 : -1), 0);
     const index = Math.max(0, Math.min(universityTiers.length - 1, 4 - Math.floor(netScore / 2)));
     setCurrentUniversity(universityTiers[index]);
   }, []);
