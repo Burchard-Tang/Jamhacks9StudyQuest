@@ -4,7 +4,7 @@ const FrontPage = () => {
     return(
         <>
             <h1>FrontPage</h1>
-            <Link to="/login">Log in</Link>
+            <Link to="/app/dashboard">dash</Link>
 
         </>
     );
