@@ -1,5 +1,6 @@
 // src/pages/Study.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import './study.css';  // <-- import the styles here
 
 const Study = () => {
   const [desiredTime, setDesiredTime] = useState(0); // in seconds
