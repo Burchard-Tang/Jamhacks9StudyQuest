@@ -35,7 +35,6 @@ const Dashboard = () => {
         <h2>Your Character's Current University</h2>
         <div className="school-tier">{currentUniversity}</div>
       </div>
-
       <div className="chapters">
         <h2>Story Progress</h2>
         <ol className="chapter-list">
