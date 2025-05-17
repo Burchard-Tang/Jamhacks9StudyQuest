@@ -182,11 +182,7 @@ const Groups = () => {
                                         <td>{idx + 1}</td>
                                         <td>{member.username}</td>
                                         <td>
-                                        {universityTiers[
-                                            member.current_university
-                                                ? member.current_university
-                                                : 0
-                                        ] || member.current_university}
+                                        {universityTiers[Math.min(Math.max((member.current_university ? member.current_university : 0, 0), universityTiers.length-1))] || member.current_university}
                                         </td>
                                     </tr>
                                 ))}

@@ -1,11 +1,7 @@
 // src/pages/Study.jsx
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
-import './study.css';
-=======
 import './study.css';  // <-- import the styles here
 import axios from 'axios';
->>>>>>> BurchardBranch
 
 const Study = () => {
   const [desiredTime, setDesiredTime] = useState(""); 
@@ -41,11 +37,6 @@ const startStudySession = () => {
   }, 1000);
 };
 
-<<<<<<< HEAD
-  const stopStudySession = (message = null) => {
-  setIsStudying(false);
-  clearInterval(timerRef.current);
-=======
   const handlePerformanceUpdate = async (performance) => {
     const user = JSON.parse(localStorage.getItem("user")) || {};
     const universityTiers = [
@@ -95,25 +86,13 @@ const startStudySession = () => {
   const stopStudySession = async (message = null) => {
     setIsStudying(false);
     clearInterval(timerRef.current);
->>>>>>> BurchardBranch
 
   const desiredTimeSeconds = Number(desiredTime) * 60;
   let performance = "average";
-  const ratio = elapsedTime / desiredTimeSeconds;
-
-<<<<<<< HEAD
-  if (ratio >= 0.9) performance = "good";
-  else if (ratio < 0.5) performance = "bad";
-
-  if (message) {
-    setSessionResult(message);
-  } else {
-    const newStoryText = generateStory(performance);
-    const newChapter = {
-      text: newStoryText,
-      success: performance === "good"
-    };
-=======
+    const ratio = elapsedTime / desiredTime;
+    if (ratio >= 0.9) performance = "good";
+    else if (ratio < 0.5) performance = "bad";
+    
     if (message) {
       setSessionResult(message);
     } else {
@@ -124,24 +103,8 @@ const startStudySession = () => {
         success: performance === "good"
       };
 
-      // Save to localStorage
-      let existingChapters = [];
-      try {
-        const stored = JSON.parse(localStorage.getItem("studyChapters"));
-        if (Array.isArray(stored)) {
-          existingChapters = stored;
-        } else if (stored && Array.isArray(stored.chapters)) {
-          existingChapters = stored.chapters;
-        }
-      } catch (e) {
-        existingChapters = [];
-      }
+          const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
       const updatedChapters = [...existingChapters, newChapter];
-      localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
->>>>>>> BurchardBranch
-
-    const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
-    const updatedChapters = [...existingChapters, newChapter];
     localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
 
     setLatestStory(newStoryText);

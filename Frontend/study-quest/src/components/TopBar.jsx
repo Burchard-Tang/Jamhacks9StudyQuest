@@ -51,7 +51,7 @@ function TopBar() {
     <div>
       <nav className="topbar">
         <div className="user-info">
-          <p>{user.username}: {universityTiers[university] || university}</p>
+          <p>{user.username}: {universityTiers[Math.min(Math.max((university,0), universityTiers.length-1))]}</p>
         </div>
 
         <ul className="nav-links">

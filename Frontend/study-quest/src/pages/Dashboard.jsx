@@ -101,9 +101,8 @@ const Dashboard = () => {
         <div className="school-status">
           <h2>Your Character's Current University</h2>
           <div className="school-tier">
-            {universityTiers[currentUniversity ? currentUniversity : 0]}
+            {universityTiers[Math.min(Math.max((currentUniversity ? currentUniversity : 0,0), universityTiers.length-1))]}
           </div>
-          <p>{user.username}: {universityTiers[universityIdx] || 'Unknown'}</p>
         </div>
 
         <div className="chapters">
