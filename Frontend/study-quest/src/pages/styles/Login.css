@@ -1,61 +1,81 @@
-.auth-container {
-    max-width: 400px;
-    margin: 100px auto;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.auth-page {
+  background-color: #FDF6E3;
+  background-image: url('../../../public/Images/fantasy background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Georgia', serif;
+  color: #3B2F2F;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
+.auth-box {
+  background-color: rgba(253, 246, 227, 0.95);
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #D65A31;
+  text-shadow: 1px 1px 0 #8C7B6B;
 }
 
 .auth-form input {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    transition: border 0.3s ease;
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 2px solid #D65A31;
+  border-radius: 10px;
+  background-color: #fdf2dc;
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
 }
 
-.auth-form input:focus {
-    border-color: #007bff;
-    outline: none;
+.auth-button {
+  background-color: #D65A31;
+  color: #FDF6E3;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
 }
 
-.auth-form button {
-    padding: 0.75rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+.auth-button:hover {
+  background-color: #b24a28;
 }
 
-.auth-form button:hover {
-    background-color: #0056b3;
+.auth-error {
+  color: #b22222;
+  margin-top: 0.5rem;
+  font-weight: bold;
 }
 
-.switch-button {
-    margin-top: 1rem;
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.95rem;
+.auth-toggle {
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #8C7B6B;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-decoration: underline;
 }
 
-.error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 0.9rem;
+.auth-toggle:hover {
+  color: #D65A31;
 }
