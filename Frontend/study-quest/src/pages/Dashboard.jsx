@@ -44,7 +44,8 @@ const Dashboard = () => {
   const currentChapter = chapters[visibleIndex];
 
   return (
-    <div className="dashboard">
+    <div className="dashboard" >
+    <div className='background'>
       <div className="school-status">
         <h2>Your Character's Current University</h2>
         <div className="school-tier">{currentUniversity}</div>
@@ -72,6 +73,7 @@ const Dashboard = () => {
             Next ▶
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
