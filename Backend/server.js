@@ -125,6 +125,24 @@ app.put('/create', (req, res) => {
     });
 });
 
+app.put('/update', (req, res) => {
+    const { userId, currentUniversity } = req.body;
+    if (userId == null || currentUniversity == null) { // allow 0 and 1
+        return res.status(400).json({ success: false, message: "Missing userId or currentUniversity" });
+    }
+    const sql = 'UPDATE users SET current_university = ? WHERE user_id = ?';
+    db.query(sql, [currentUniversity, userId], (err, result) => {
+        if (err) {
+            console.log('Update error:', err);
+            return res.status(500).json({ success: false, message: "Update failed" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        return res.json({ success: true, message: "User updated successfully" });
+    });
+});
+
 app.post('/creategroup', (req, res) => {
     const { groupName } = req.body;
     console.log('Received groupName:', groupName); // This is fine here
