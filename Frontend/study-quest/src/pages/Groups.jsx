@@ -185,7 +185,11 @@ const Groups = () => {
                                     <td>{idx + 1}</td>
                                     <td>{member.username}</td>
                                     <td>
-                                        {universityTiers[(member.current_university ?? 1) - 1] || member.current_university}
+                                        {universityTiers[
+                                            member.current_university
+                                                ? member.current_university
+                                                : 0
+                                        ] || member.current_university}
                                     </td>
                                 </tr>
                             ))}

@@ -3,13 +3,16 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import './TopBar.css';
 import { useEffect } from 'react';
+import axios from 'axios';
 
 function TopBar() {
   const navigate = useNavigate();
 
   // Example user info (replace with actual data or props)
   const user = JSON.parse(localStorage.getItem('user')) || 'John Doe';
-  const university = user.current_university || 0;
+  console.log(user);
+  const university = user.current_university ? user.current_university : 1;
+  console.log("unnuuniii" + university)
 
   const universityTiers = [
   'Deferred to geomatics',
@@ -28,8 +31,19 @@ function TopBar() {
   'Brock Gender Studies',
 ];
 
-  const handleLogout = () => {
-    // Clear tokens or auth data if needed
+  const handleLogout = async () => {
+    // Save current university to SQL before logout
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.user_id && user.current_university) {
+      try {
+        await axios.put("http://localhost:8081/update", {
+          userId: user.user_id,
+          currentUniversity: user.current_university,
+        });
+      } catch (e) {
+        // Optionally handle error
+      }
+    }
     navigate('/login');
   };  
 
@@ -37,7 +51,7 @@ function TopBar() {
     <div>
       <nav className="topbar">
         <div className="user-info">
-          <p>{user.username}: {universityTiers[university]}</p>
+          <p>{user.username}: {universityTiers[university] || university}</p>
         </div>
 
         <ul className="nav-links">

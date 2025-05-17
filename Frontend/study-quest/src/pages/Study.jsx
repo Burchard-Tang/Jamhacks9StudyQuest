@@ -1,6 +1,7 @@
 // src/pages/Study.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './study.css';  // <-- import the styles here
+import axios from 'axios';
 
 const Study = () => {
   const [desiredTime, setDesiredTime] = useState(0); // in seconds
@@ -32,7 +33,53 @@ const Study = () => {
     }, 1000);
   };
 
-  const stopStudySession = (message = null) => {
+  const handlePerformanceUpdate = async (performance) => {
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const universityTiers = [
+      'Deferred to geomatics', // highest/best
+      'Stanford',
+      'MIT',
+      'Harvard',
+      'Waterloo CS',
+      'UofT',
+      'UBC',
+      'McMaster',
+      'Queens',
+      'Toronto Metropolitan',
+      'York',
+      'Seneca',
+      "You're cooked",
+      'Brock Gender Studies', // lowest/worst
+    ];
+    const maxTier = universityTiers.length;
+    let currentUniversity = user.current_university || 6;
+
+    // Lower index is better, so "good" means move toward 1, "bad" means move toward maxTier
+    let newTier = currentUniversity;
+    if (performance === "good") {
+      newTier = Math.max(1, currentUniversity - 1);
+    } else if (performance === "bad") {
+      newTier = Math.min(maxTier, currentUniversity + 1);
+    }
+
+    // Update localStorage first
+    localStorage.setItem("user", JSON.stringify({ ...user, current_university: newTier }));
+
+    // Update backend (SQL database) with correct types
+    if (user.user_id) {
+      try {
+        await axios.put("http://localhost:8081/update", {
+          userId: Number(user.user_id),
+          currentUniversity: Number(newTier),
+        });
+      } catch (e) {
+        // Optionally handle error
+        console.error("Failed to update university in backend", e);
+      }
+    }
+  };
+
+  const stopStudySession = async (message = null) => {
     setIsStudying(false);
     clearInterval(timerRef.current);
 
@@ -44,6 +91,7 @@ const Study = () => {
     if (message) {
       setSessionResult(message);
     } else {
+      await handlePerformanceUpdate(performance);
       const newStoryText = generateStory(performance);
       const newChapter = {
         text: newStoryText,
@@ -51,7 +99,17 @@ const Study = () => {
       };
 
       // Save to localStorage
-      const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
+      let existingChapters = [];
+      try {
+        const stored = JSON.parse(localStorage.getItem("studyChapters"));
+        if (Array.isArray(stored)) {
+          existingChapters = stored;
+        } else if (stored && Array.isArray(stored.chapters)) {
+          existingChapters = stored.chapters;
+        }
+      } catch (e) {
+        existingChapters = [];
+      }
       const updatedChapters = [...existingChapters, newChapter];
       localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
 
@@ -61,20 +119,21 @@ const Study = () => {
   };
 
   const generateStory = (performance) => {
+    // Update stories to reflect the new ranking direction
     const good = [
-      "You aced the exam and earned a prestigious scholarship!",
-      "You impressed the admissions team and boosted your portfolio!",
-      "Your research project won an academic award!"
+      "You worked so hard you got deferred to geomatics! (That's a good thing!)",
+      "You impressed everyone and moved up a tier!",
+      "Your dedication is unmatched—you're climbing to the top!"
     ];
     const average = [
-      "You completed your work and stayed on track.",
-      "You kept pace with your peers, but nothing big happened.",
-      "You got through the day with minor achievements."
+      "You held your ground, but didn't move up or down.",
+      "You stayed steady in your university journey.",
+      "Nothing changed, but you kept at it."
     ];
     const bad = [
-      "You missed your goals and fell behind.",
-      "You got distracted and forgot a major assignment.",
-      "Your study session was wasted on scrolling memes."
+      "You slacked off and slipped closer to Brock Gender Studies.",
+      "You lost focus and dropped a tier.",
+      "Your study session was rough—watch out for the bottom!"
     ];
 
     const options = performance === 'good' ? good : performance === 'bad' ? bad : average;
