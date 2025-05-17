@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import './FileStorage.css';
-import TopBar from '../components/TopBar';
 
 const Storage = () => {
   const [files, setFiles] = useState(() => JSON.parse(localStorage.getItem('storedFiles')) || []);

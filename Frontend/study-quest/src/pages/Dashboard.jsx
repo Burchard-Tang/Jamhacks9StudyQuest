@@ -24,7 +24,14 @@ const Dashboard = () => {
   const [visibleIndex, setVisibleIndex] = useState(0);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('studyChapters')) || [];
+    const user = JSON.parse(localStorage.getItem('user'));
+    let stored = JSON.parse(localStorage.getItem('studyChapters'));
+    // If stored is an object with chapters, extract the array
+    if (stored && !Array.isArray(stored) && Array.isArray(stored.chapters)) {
+      stored = stored.chapters;
+    }
+    // If stored is not an array, default to []
+    if (!Array.isArray(stored)) stored = [];
     setChapters(stored);
     setVisibleIndex(stored.length - 1);
 
@@ -42,6 +49,10 @@ const Dashboard = () => {
   };
 
   const currentChapter = chapters[visibleIndex];
+
+  const updateLocalStorage = (chaptersArray) => {
+    localStorage.setItem('studyChapters', JSON.stringify(chaptersArray));
+  };
 
   return (
     <div className="dashboard" >

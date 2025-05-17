@@ -2,24 +2,42 @@
 
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import './TopBar.css';
+import { useEffect } from 'react';
 
 function TopBar() {
   const navigate = useNavigate();
 
   // Example user info (replace with actual data or props)
-  const userName = "John Doe";
-  const userUniversity = "Awesome University";
+  const user = JSON.parse(localStorage.getItem('user')) || 'John Doe';
+  const university = user.current_university || 0;
+
+  const universityTiers = [
+  'Deferred to geomatics',
+  'Stanford',
+  'MIT',
+  'Harvard',
+  'Waterloo CS',
+  'UofT',
+  'UBC',
+  'McMaster',
+  'Queens',
+  'Toronto Metropolitan',
+  'York',
+  'Seneca',
+  'You\'re cooked',
+  'Brock Gender Studies',
+];
 
   const handleLogout = () => {
     // Clear tokens or auth data if needed
     navigate('/login');
-  };
+  };  
 
   return (
     <div>
       <nav className="topbar">
         <div className="user-info">
-          <p>{userName}: {userUniversity}</p>
+          <p>{user.username}: {universityTiers[university]}</p>
         </div>
 
         <ul className="nav-links">

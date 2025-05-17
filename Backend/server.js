@@ -112,8 +112,8 @@ app.put('/create', (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ success: false, message: "Missing username or password" });
     }
-    const sql = 'INSERT INTO users (username, password_hash, current_university, group_id) VALUES (?, ?, ?, ?)';
-    db.query(sql, [username, password, 6, null], (err, result) => {
+    const sql = 'INSERT INTO users (username, password_hash, current_university, group_id) VALUES (?, ?, 6, ?)';
+    db.query(sql, [username, password, null], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.json({ success: false, message: "Username already exists" });
@@ -192,7 +192,7 @@ app.get('/group/:id', (req, res) => {
 });
 
 app.get('/group/:id/users', (req, res) => {
-    const { groupId } = req.body;
+    const groupId = req.params.id; // <-- Use params, not body
     const sql = `
         SELECT user_id, username, current_university
         FROM users

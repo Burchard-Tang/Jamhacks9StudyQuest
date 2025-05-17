@@ -11,15 +11,21 @@ const Groups = () => {
     const [groupData, setGroupData] = useState();
     const [groupMembers, setGroupMembers] = useState([]);
     const universityTiers = [
-        'Harvard',
-        'UofT',
-        'Queens',
-        'McMaster',
-        'Waterloo',
-        'York',
-        'Toronto Metropolitan',
-        'Seneca'
-    ];
+  'Deferred to geomatics',
+  'Stanford',
+  'MIT',
+  'Harvard',
+  'Waterloo CS',
+  'UofT',
+  'UBC',
+  'McMaster',
+  'Queens',
+  'Toronto Metropolitan',
+  'York',
+  'Seneca',
+  'You\'re cooked',
+  'Brock Gender Studies',
+];
 
     // Fetch group data when groupId changes
     useEffect(() => {
@@ -168,16 +174,18 @@ const Groups = () => {
                     <table>
                         <thead>
                             <tr>
+                                <th>Rank</th>
                                 <th>Username</th>
                                 <th>University Tier</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {groupMembers.map(member => (
+                            {groupMembers.map((member, idx) => (
                                 <tr key={member.user_id}>
+                                    <td>{idx + 1}</td>
                                     <td>{member.username}</td>
                                     <td>
-                                        {universityTiers[member.current_university] || member.current_university}
+                                        {universityTiers[(member.current_university ?? 1) - 1] || member.current_university}
                                     </td>
                                 </tr>
                             ))}
