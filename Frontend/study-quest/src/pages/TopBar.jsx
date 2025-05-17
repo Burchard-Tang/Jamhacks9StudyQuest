@@ -1,31 +1,17 @@
-import { Link } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
-const TopBar = () => {
-    return (
-        <>
-            <div style={{
-                position: "fixed",
-                margin: "auto",
-                top:"0",
-                left: "0",
-                display: "inline-block",
-                background: "white",
-                width: "100%",
-                height: "50px",
-                padding: "40px",
-                border: "1px, solid black",
-                boxShadow: "0px 0px 5px black"
-
-            }}>
-                <a class="linkObj"><Link to="/dashboard">dash</Link></a>
-                <a class="linkObj"><Link to="/study">study</Link></a>
-                <a class="linkObj"><Link to="/groups">groups</Link></a>
-                <a class="linkObj"><Link to="/storage">storage</Link></a>
-            </div >
-            <Outlet />
-        </>
-    );
+export default function TopBar() {
+  return (
+    <>
+      <div className="top-bar">
+        <nav className="nav-links">
+          <Link to="/dashboard" className="linkObj">Dashboard</Link>
+          <Link to="/study" className="linkObj">Study</Link>
+          <Link to="/groups" className="linkObj">Groups</Link>
+          <Link to="/storage" className="linkObj">Storage</Link>
+        </nav>
+      </div>
+      <Outlet />
+    </>
+  );
 }
-
-export default TopBar;
