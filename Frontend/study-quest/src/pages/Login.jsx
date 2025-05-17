@@ -23,7 +23,7 @@ const Login = () => {
 
         try {
             const res = await axios.post("http://localhost:8081/verifyuser", {
-                name: username,
+                username,
                 password,
             });
 
@@ -31,7 +31,7 @@ const Login = () => {
                 storeUser(res.data.user);
                 setUsername("");
                 setPassword("");
-                navigate("/dashboard");
+                navigate("/app/dashboard");
             } else {
                 setError("Invalid username or password.");
             }
@@ -56,7 +56,7 @@ const Login = () => {
 
         try {
             const res = await axios.put("http://localhost:8081/create", {
-                name: username,
+                username,
                 password,
             });
 
@@ -65,7 +65,7 @@ const Login = () => {
                 setUsername("");
                 setPassword("");
                 setConfirmPassword("");
-                navigate("/dashboard");
+                navigate("/app/dashboard");
             } else {
                 setError("Signup failed. Username may already exist.");
             }
@@ -80,10 +80,7 @@ const Login = () => {
     return (
         <div className="auth-container">
             <h2>{loginOrSignup ? "Login" : "Sign Up"}</h2>
-            <form
-                onSubmit={loginOrSignup ? handleLogin : handleSignup}
-                className="auth-form"
-            >
+            <form onSubmit={loginOrSignup ? handleLogin : handleSignup} className="auth-form">
                 <input
                     type="text"
                     placeholder="Username"
