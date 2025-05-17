@@ -3,8 +3,10 @@
 # dependencies
 /Frontend/study-quest/node_modules
 /Frontend/study-quest/package-lock.json
+/Frontend/study-quest/package.json
 /Backend/node_modules
 /Backend/package-lock.json
+/Backend/package.json
 /.pnp
 .pnp.js
 
