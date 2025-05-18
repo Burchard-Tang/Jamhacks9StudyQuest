@@ -9,7 +9,9 @@ function TopBar() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')) || {});
-  const [university, setUniversity] = useState(user.current_university ? user.current_university : 1);
+  const [university, setUniversity] = useState(
+    typeof user.current_university === "number" ? user.current_university : 6
+  );
 
   const universityTiers = [
     'Deferred to geomatics',
@@ -34,7 +36,9 @@ function TopBar() {
       if (e.key === 'user') {
         const updatedUser = JSON.parse(localStorage.getItem('user')) || {};
         setUser(updatedUser);
-        setUniversity(updatedUser.current_university ? updatedUser.current_university : 1);
+        setUniversity(
+          typeof updatedUser.current_university === "number" ? updatedUser.current_university : 6
+        );
       }
     };
     window.addEventListener('storage', handleStorage);
@@ -47,7 +51,9 @@ function TopBar() {
       const updatedUser = JSON.parse(localStorage.getItem('user')) || {};
       if (updatedUser.current_university !== university) {
         setUser(updatedUser);
-        setUniversity(updatedUser.current_university ? updatedUser.current_university : 1);
+        setUniversity(
+          typeof updatedUser.current_university === "number" ? updatedUser.current_university : 6
+        );
       }
     }, 500);
     return () => clearInterval(interval);

@@ -116,7 +116,7 @@ app.put('/create', (req, res) => {
             }
             return res.status(500).json({ success: false, message: "Signup failed" });
         }
-        const user = { user_id: result.insertId, username, current_university: 1, group_id: null };
+        const user = { user_id: result.insertId, username, current_university: 6, group_id: null };
         return res.json({ success: true, user });
     });
 });
@@ -233,7 +233,7 @@ app.get('/users', (req, res) => {
     });
 });
 
-app.post('/studysession', (req, res) => {
+app.post('/savestudysession', (req, res) => {
     const { user_id, start_time, end_time, focus_score, content } = req.body;
     if (!user_id || !start_time || !end_time || !content) {
         return res.status(400).json({ success: false, message: "Missing required fields" });

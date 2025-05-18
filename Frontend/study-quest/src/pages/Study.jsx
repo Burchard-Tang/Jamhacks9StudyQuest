@@ -91,66 +91,68 @@ const startStudySession = () => {
 
     const desiredTimeSeconds = Number(desiredTime) * 60;
     let performance = "average";
-    const ratio = elapsedTime / desiredTime;
+    const ratio = elapsedTime / desiredTimeSeconds * 1000;
     if (ratio >= 0.9) performance = "good";
     else if (ratio < 0.5) performance = "bad";
 
-    // Save session to backend
     const user = JSON.parse(localStorage.getItem("user")) || {};
+    let storyText;
+    let chapterSuccess;
+
+    if (message) {
+      storyText = message;
+      chapterSuccess = false;
+    } else {
+      // Call backend to generate the story and use its response everywhere
+      const planned_duration = Number(desiredTime);
+      const actual_duration = Math.floor(elapsedTime / 60);
+      try {
+        const response = await axios.post("http://localhost:5000/study-session", {
+          user_id: user.user_id || "default",
+          planned_duration,
+          actual_duration
+        });
+        if (response.data && response.data.success) {
+          storyText = response.data.segment;
+        } else {
+          storyText = "Could not generate story. Please try again later.";
+        }
+      } catch (e) {
+        storyText = "Error connecting to story backend.";
+      }
+      chapterSuccess = performance === "good";
+      await handlePerformanceUpdate(performance);
+    }
+
+    // Save session to backend and use the same storyText for all
     if (user.user_id && sessionStart) {
       try {
-        await axios.post("http://localhost:8081/studysession", {
+        await axios.post("http://localhost:8081/savestudysession", {
           user_id: user.user_id,
           start_time: sessionStart.toISOString().slice(0, 19).replace('T', ' '),
           end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
           focus_score: ratio >= 0.9 ? 2 : ratio < 0.5 ? 0 : 1,
-          content: message ? message : await generateStory(performance),
+          content: storyText,
         });
       } catch (e) {
-        // Optionally handle error
         console.error("Failed to save study session", e);
       }
     }
-    
+
+    // Always update chapters and latestStory with the same storyText
+    const newChapter = {
+      text: storyText,
+      success: chapterSuccess
+    };
+    const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
+    const updatedChapters = [...existingChapters, newChapter];
+    localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
+    setLatestStory(storyText);
+
     if (message) {
       setSessionResult(message);
     } else {
-      await handlePerformanceUpdate(performance);
-      const newStoryText = await generateStory(performance);
-      const newChapter = {
-        text: newStoryText,
-        success: performance === "good"
-      };
-
-      const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
-      const updatedChapters = [...existingChapters, newChapter];
-      localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
-
-      setLatestStory(newStoryText);
       setSessionResult(`Study session complete! (${performance})`);
-    }
-  };
-
-  // Replace the old generateStory with an async function that calls the backend
-  const generateStory = async (performance) => {
-    // Map performance to backend parameters
-    const user = JSON.parse(localStorage.getItem("user")) || {};
-    const planned_duration = Number(desiredTime);
-    const actual_duration = Math.floor(elapsedTime / 60);
-
-    try {
-      const response = await axios.post("http://localhost:5000/study-session", {
-        user_id: user.user_id || "default",
-        planned_duration,
-        actual_duration
-      });
-      if (response.data && response.data.success) {
-        return response.data.segment;
-      } else {
-        return "Could not generate story. Please try again later.";
-      }
-    } catch (e) {
-      return "Error connecting to story backend.";
     }
   };
 

@@ -67,7 +67,8 @@ const Dashboard = () => {
             const chaptersArr = res.data.sessions.map(session => ({
               text: session.content,
               success: session.focus_score === 2 // assuming 2 is "good"
-            }));
+            })).reverse(); // Reverse so newest is last
+            console.log(chaptersArr);
             setChapters(chaptersArr);
             setVisibleIndex(chaptersArr.length - 1);
           } else {

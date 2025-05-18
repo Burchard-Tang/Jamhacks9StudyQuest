@@ -73,7 +73,7 @@ class RedditScraper:
             print(f"[ERROR] ollama.generate theme failed: {e}")
             return []
 
-    def scrape(self, limit=25):
+    def scrape(self, limit=50):
         """Main scraping function with AI analysis"""
         results = {sub: {"positive": [], "negative": []} for sub in self.subreddits}
         
