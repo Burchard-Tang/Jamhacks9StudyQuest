@@ -24,7 +24,7 @@ const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const universityIdx = user.current_university ? user.current_university : 0;
   const [chapters, setChapters] = useState([]);
-  const [currentUniversity, setCurrentUniversity] = useState(user.current_university || 6);
+  const [currentUniversity, setCurrentUniversity] = useState(user.current_university);
   const [visibleIndex, setVisibleIndex] = useState(0);
 
   // Fetch latest university from backend on mount

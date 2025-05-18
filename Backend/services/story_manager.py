@@ -13,20 +13,21 @@ from datetime import datetime
 from pathlib import Path
 
 class StoryManager:
-    def __init__(self, user_id):
+    def __init__(self, user_id, university=None):
         self.user_id = user_id
         self.data_dir = Path("data")
         self.story_file = self.data_dir / f"user_stories/{user_id}.json"
         self.themes_file = self.data_dir / "theme_keywords.json"
-        
+        self.university = university  # <-- store university
+
         # Initialize directories
         os.makedirs(self.data_dir / "user_stories", exist_ok=True)
-        
+
         # Load or initialize data
-        self.story = self._load_story()
+        self.story = self._load_story(self.university)
         self.themes = self._load_themes()
 
-    def _load_story(self):
+    def _load_story(self, university=None):
         """Load or initialize user story"""
         try:
             with open(self.story_file, "r") as f:
@@ -34,10 +35,19 @@ class StoryManager:
                 # Validate story structure
                 if not all(k in story for k in ["university", "story_arc", "stats"]):
                     raise ValueError("Invalid story format")
+                # If university is provided and different, update it
+                if university and story.get("university") != university:
+                    story["university"] = university
+                    with open(self.story_file, "w") as wf:
+                        json.dump(story, wf, indent=2)
                 return story
         except (FileNotFoundError, json.JSONDecodeError, ValueError):
-            # Initialize new story with random university
-            default_uni = random.choice(list(self._load_themes().get("positive", {}).keys()) or ["uwaterloo"])
+            # Initialize new story with user's university if provided, else random
+            themes = self._load_themes()
+            if university and university in (themes.get("positive", {}) or {}):
+                default_uni = university
+            else:
+                default_uni = random.choice(list(themes.get("positive", {}).keys()) or ["uwaterloo"])
             return {
                 "university": default_uni,
                 "story_arc": ["You've just arrived at university. Your journey begins..."],

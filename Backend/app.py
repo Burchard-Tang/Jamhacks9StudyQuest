@@ -31,18 +31,14 @@ def init_scraper():
 def study_session():
     """Handle study session logging"""
     try:
-        # data = {
-        #     "user_id": "test_user",
-        #     "planned_duration": 30,
-        #     "actual_duration": 35
-        # }
         data = request.json
         user_id = data.get("user_id", "default")
         planned = data.get("planned_duration", 30)
         actual = data.get("actual_duration", 30)
+        university = data.get("university")  # <-- get university from request
         success = actual >= planned
 
-        manager = StoryManager(user_id)
+        manager = StoryManager(user_id, university=university)  # <-- pass university
         segment = manager.generate_segment(success, actual)
         return jsonify({
             "success": True,

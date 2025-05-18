@@ -110,7 +110,8 @@ const startStudySession = () => {
         const response = await axios.post("http://localhost:5000/study-session", {
           user_id: user.user_id || "default",
           planned_duration,
-          actual_duration
+          actual_duration,
+          university: user.current_university // <-- send university
         });
         if (response.data && response.data.success) {
           storyText = response.data.segment;
