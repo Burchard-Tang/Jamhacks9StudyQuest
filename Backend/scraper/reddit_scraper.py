@@ -43,13 +43,14 @@ class RedditScraper:
         
         try:
             response = ollama.generate(
-                model="llama3",
+                model="llama2",
                 prompt=prompt,
                 format="json",
                 options={"temperature": 0.2}
             )
             return json.loads(response["response"])
-        except:
+        except Exception as e:
+            print(f"[ERROR] ollama.generate sentiment failed: {e}")
             return {"sentiment": "neutral", "keywords": [], "reason": "Analysis failed"}
 
     def _extract_themes(self, text, sentiment):
@@ -62,12 +63,13 @@ class RedditScraper:
         
         try:
             response = ollama.generate(
-                model="llama3",
+                model="llama2",
                 prompt=prompt,
                 format="json"
             )
             return json.loads(response["response"])
-        except:
+        except Exception as e:
+            print(f"[ERROR] ollama.generate theme failed: {e}")
             return []
 
     def scrape(self, limit=25):

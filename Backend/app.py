@@ -24,6 +24,7 @@ def init_scraper():
             "message": f"Collected {len(scraper.theme_keywords['positive'])} positive and {len(scraper.theme_keywords['negative'])} negative themes"
         })
     except Exception as e:
+        print(f"[ERROR] init_scraper failed: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/study-session", methods=["POST"])
