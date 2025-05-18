@@ -29,6 +29,10 @@ const Login = () => {
 
             if (res.data.success) {
                 storeUser(res.data.user);
+                // Store study sessions if present
+                if (Array.isArray(res.data.sessions)) {
+                    localStorage.setItem("studySessions", JSON.stringify(res.data.sessions));
+                }
                 setUsername("");
                 setPassword("");
                 navigate("/app/dashboard");

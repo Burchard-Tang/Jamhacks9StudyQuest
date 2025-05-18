@@ -10,6 +10,7 @@ const Study = () => {
   const [sessionResult, setSessionResult] = useState(null);
   const [latestStory, setLatestStory] = useState(null);
   const [inputTouched, setInputTouched] = useState(false);
+  const [sessionStart, setSessionStart] = useState(null);
 
   const timerRef = useRef(null);
   const focusLostRef = useRef(false);
@@ -31,6 +32,7 @@ const startStudySession = () => {
 
   setIsStudying(true);
   setElapsedTime(0);
+  setSessionStart(new Date()); // Save start time
   focusLostRef.current = false;
   timerRef.current = setInterval(() => {
     setElapsedTime((prev) => prev + 1);
@@ -92,6 +94,23 @@ const startStudySession = () => {
     const ratio = elapsedTime / desiredTime;
     if (ratio >= 0.9) performance = "good";
     else if (ratio < 0.5) performance = "bad";
+
+    // Save session to backend
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    if (user.user_id && sessionStart) {
+      try {
+        await axios.post("http://localhost:8081/studysession", {
+          user_id: user.user_id,
+          start_time: sessionStart.toISOString().slice(0, 19).replace('T', ' '),
+          end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          focus_score: ratio >= 0.9 ? 2 : ratio < 0.5 ? 0 : 1,
+          content: message ? message : generateStory(performance),
+        });
+      } catch (e) {
+        // Optionally handle error
+        console.error("Failed to save study session", e);
+      }
+    }
     
     if (message) {
       setSessionResult(message);

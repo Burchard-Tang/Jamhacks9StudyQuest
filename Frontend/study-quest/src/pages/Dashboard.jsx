@@ -56,15 +56,32 @@ const Dashboard = () => {
     }
   }, [user.user_id]);
 
+  // Fetch only this user's study sessions from backend
   useEffect(() => {
-    let stored = JSON.parse(localStorage.getItem('studyChapters'));
-    if (stored && !Array.isArray(stored) && Array.isArray(stored.chapters)) {
-      stored = stored.chapters;
-    }
-    if (!Array.isArray(stored)) stored = [];
-    setChapters(stored);
-    setVisibleIndex(stored.length - 1);
-  }, []);
+    const fetchSessions = async () => {
+      if (user.user_id) {
+        try {
+          const res = await axios.get(`http://localhost:8081/studysessions/${user.user_id}`);
+          if (res.data.success && Array.isArray(res.data.sessions)) {
+            // Map sessions to chapters for display
+            const chaptersArr = res.data.sessions.map(session => ({
+              text: session.content,
+              success: session.focus_score === 2 // assuming 2 is "good"
+            }));
+            setChapters(chaptersArr);
+            setVisibleIndex(chaptersArr.length - 1);
+          } else {
+            setChapters([]);
+            setVisibleIndex(0);
+          }
+        } catch (e) {
+          setChapters([]);
+          setVisibleIndex(0);
+        }
+      }
+    };
+    fetchSessions();
+  }, [user.user_id]);
 
   const handlePerformanceUpdate = (performance) => {
     let newTier = currentUniversity || 6;
@@ -91,17 +108,13 @@ const Dashboard = () => {
 
   const currentChapter = chapters[visibleIndex];
 
-  const updateLocalStorage = (chaptersArray) => {
-    localStorage.setItem('studyChapters', JSON.stringify(chaptersArray));
-  };
-
   return (
     <div className="dashboard" >
       <div className='background'>
         <div className="school-status">
           <h2>Your Character's Current University</h2>
           <div className="school-tier">
-            {universityTiers[Math.min(Math.max((currentUniversity ? currentUniversity : 0,0), universityTiers.length-1))]}
+            {universityTiers[Math.min(Math.max(currentUniversity ? currentUniversity : 0,0), universityTiers.length-1)]}
           </div>
         </div>
 

@@ -51,15 +51,7 @@ db.query(dbSql, (err) => {
                 start_time DATETIME NOT NULL,
                 end_time DATETIME NOT NULL,
                 focus_score INT,
-                FOREIGN KEY (user_id) REFERENCES users(user_id)
-            ) ENGINE=InnoDB`,
-
-            `CREATE TABLE IF NOT EXISTS story_chapters (
-                chapter_id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
                 content TEXT NOT NULL,
-                university_change INT,
-                date DATE NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
             ) ENGINE=InnoDB`,
 
@@ -100,7 +92,11 @@ app.post('/verifyuser', (req, res) => {
         const user = rows[0];
         if (password === user.password_hash) {
             delete user.password_hash;
-            return res.json({ success: true, user });
+            // Fetch study sessions for this user
+            db.query('SELECT * FROM study_sessions WHERE user_id = ? ORDER BY start_time DESC', [user.user_id], (err2, sessions) => {
+                if (err2) return res.status(500).json({ success: false, message: "Internal server error" });
+                return res.json({ success: true, user, sessions });
+            });
         } else {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
@@ -234,6 +230,30 @@ app.get('/users', (req, res) => {
     db.query(sql, (err, rows) => {
         if (err) return res.status(500).json({ success: false, message: "Database error" });
         return res.json({ success: true, users: rows });
+    });
+});
+
+app.post('/studysession', (req, res) => {
+    const { user_id, start_time, end_time, focus_score, content } = req.body;
+    if (!user_id || !start_time || !end_time || !content) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+    const sql = `INSERT INTO study_sessions (user_id, start_time, end_time, focus_score, content)
+                 VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [user_id, start_time, end_time, focus_score, content], (err, result) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: "Failed to save session" });
+        }
+        return res.json({ success: true, session_id: result.insertId });
+    });
+});
+
+app.get('/studysessions/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const sql = `SELECT * FROM study_sessions WHERE user_id = ? ORDER BY start_time DESC`;
+    db.query(sql, [userId], (err, rows) => {
+        if (err) return res.status(500).json({ success: false, message: "Database error" });
+        return res.json({ success: true, sessions: rows });
     });
 });
 
