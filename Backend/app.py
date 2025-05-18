@@ -3,12 +3,14 @@ Enhanced Flask API with Theme Support
 """
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from services.story_manager import StoryManager
 from scraper.reddit_scraper import RedditScraper
 from pathlib import Path
 import os
 
 app = Flask(__name__)
+CORS(app)
 DATA_DIR = Path("data")
 
 @app.route("/init", methods=["POST"])

@@ -7,12 +7,13 @@ Enhanced Reddit Scraper with AI-Powered Sentiment Analysis
 
 import praw
 import json
-import ollama
 from dotenv import load_dotenv
 import os
 from collections import defaultdict
 
 load_dotenv()
+
+import ollama
 
 class RedditScraper:
     def __init__(self):

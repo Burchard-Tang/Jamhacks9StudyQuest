@@ -63,7 +63,7 @@ const startStudySession = () => {
     // Lower index is better, so "good" means move toward 1, "bad" means move toward maxTier
     let newTier = currentUniversity;
     if (performance === "good") {
-      newTier = Math.max(1, currentUniversity - 1);
+      newTier = Math.max(0, currentUniversity - 1);
     } else if (performance === "bad") {
       newTier = Math.min(maxTier, currentUniversity + 1);
     }
@@ -89,8 +89,8 @@ const startStudySession = () => {
     setIsStudying(false);
     clearInterval(timerRef.current);
 
-  const desiredTimeSeconds = Number(desiredTime) * 60;
-  let performance = "average";
+    const desiredTimeSeconds = Number(desiredTime) * 60;
+    let performance = "average";
     const ratio = elapsedTime / desiredTime;
     if (ratio >= 0.9) performance = "good";
     else if (ratio < 0.5) performance = "bad";
@@ -104,7 +104,7 @@ const startStudySession = () => {
           start_time: sessionStart.toISOString().slice(0, 19).replace('T', ' '),
           end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
           focus_score: ratio >= 0.9 ? 2 : ratio < 0.5 ? 0 : 1,
-          content: message ? message : generateStory(performance),
+          content: message ? message : await generateStory(performance),
         });
       } catch (e) {
         // Optionally handle error
@@ -116,40 +116,42 @@ const startStudySession = () => {
       setSessionResult(message);
     } else {
       await handlePerformanceUpdate(performance);
-      const newStoryText = generateStory(performance);
+      const newStoryText = await generateStory(performance);
       const newChapter = {
         text: newStoryText,
         success: performance === "good"
       };
 
-          const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
+      const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
       const updatedChapters = [...existingChapters, newChapter];
-    localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
+      localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
 
-    setLatestStory(newStoryText);
-    setSessionResult(`Study session complete! (${performance})`);
-  }
-};
+      setLatestStory(newStoryText);
+      setSessionResult(`Study session complete! (${performance})`);
+    }
+  };
 
-  const generateStory = (performance) => {
-    // Update stories to reflect the new ranking direction
-    const good = [
-      "You worked so hard you got deferred to geomatics! (That's a good thing!)",
-      "You impressed everyone and moved up a tier!",
-      "Your dedication is unmatched—you're climbing to the top!"
-    ];
-    const average = [
-      "You held your ground, but didn't move up or down.",
-      "You stayed steady in your university journey.",
-      "Nothing changed, but you kept at it."
-    ];
-    const bad = [
-      "You slacked off and slipped closer to Brock Gender Studies.",
-      "You lost focus and dropped a tier.",
-      "Your study session was rough—watch out for the bottom!"
-    ];
-    const options = performance === 'good' ? good : performance === 'bad' ? bad : average;
-    return options[Math.floor(Math.random() * options.length)];
+  // Replace the old generateStory with an async function that calls the backend
+  const generateStory = async (performance) => {
+    // Map performance to backend parameters
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const planned_duration = Number(desiredTime);
+    const actual_duration = Math.floor(elapsedTime / 60);
+
+    try {
+      const response = await axios.post("http://localhost:5000/study-session", {
+        user_id: user.user_id || "default",
+        planned_duration,
+        actual_duration
+      });
+      if (response.data && response.data.success) {
+        return response.data.segment;
+      } else {
+        return "Could not generate story. Please try again later.";
+      }
+    } catch (e) {
+      return "Error connecting to story backend.";
+    }
   };
 
   return (
