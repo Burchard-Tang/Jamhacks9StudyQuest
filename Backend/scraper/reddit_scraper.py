@@ -30,10 +30,11 @@ class RedditScraper:
 
     def _analyze_sentiment(self, text):
         """Use AI to classify post sentiment and extract themes"""
-        prompt = f"""Analyze this university-related post:
+        prompt = f"""Analyze this university-related post,:
         
-        {text[:1000]}  # Truncate to avoid context overload
+        {text[:1000]}
         
+        Extract the sentiment and the keywords that are the main reason for that sentiment.
         Respond with JSON format:
         {{
             "sentiment": "positive" or "negative",
@@ -76,31 +77,34 @@ class RedditScraper:
         """Main scraping function with AI analysis"""
         results = {sub: {"positive": [], "negative": []} for sub in self.subreddits}
         
+        limit = int(1)
         for sub in self.subreddits:
             print(f"Scraping r/{sub}...")
             try:
                 for post in self.reddit.subreddit(sub).hot(limit=limit):
                     # Analyze with AI
                     analysis = self._analyze_sentiment(post.title + " " + post.selftext)
-                    
-                    if analysis["sentiment"] in ("positive", "negative"):
-                        # Extract thematic keywords
-                        themes = self._extract_themes(post.title + " " + post.selftext, analysis["sentiment"])
-                        
+                   
+                    if analysis["sentiment"] in ["positive", "negative"]:
+                        # Aggregate keywords for story generation
+                        keywords = []
+                        for keyword in analysis["keywords"]:
+                            keywords.append(keyword.lower())
+
+                        self.theme_keywords[analysis["sentiment"]][sub] = keywords
                         # Store results
                         entry = {
                             "text": post.title,
                             "content": post.selftext,
                             "url": post.url,
-                            "keywords": themes,
                             "score": post.score,
-                            "analysis": analysis["reason"]
+                            "sentiment": analysis["sentiment"],
+                            "keywords": keywords,
+                            "reason": analysis["reason"],
                         }
                         results[sub][analysis["sentiment"]].append(entry)
-                        
-                        # Aggregate keywords for story generation
-                        for keyword in themes:
-                            self.theme_keywords[analysis["sentiment"]][sub].append(keyword.lower())
+                    else:
+                        print(f"Post skipped due to neutral sentiment: {post.title}")
             except Exception as e:
                 print(f"Error scraping r/{sub}: {str(e)}")
         
@@ -116,6 +120,11 @@ class RedditScraper:
             }
             json.dump(serializable, f, indent=2)
         
+        # User finishes the study session
+        # you want to generate a story based on the keywords and on user's previous storyline
+        # User's session was successful, use positive keywords
+        # user's session was not successful, use negative keywords
+        # User has a university, and for each university, you have a list of relevant subreddits
         return results
 
 if __name__ == "__main__":

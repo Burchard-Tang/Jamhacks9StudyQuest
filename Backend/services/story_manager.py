@@ -26,13 +26,6 @@ class StoryManager:
         self.story = self._load_story()
         self.themes = self._load_themes()
 
-        # Add this to __init__ if you want to load jokes from a file
-        try:
-            with open("data/university_jokes.json") as f:
-                self.jokes = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.jokes = []
-
     def _load_story(self):
         """Load or initialize user story"""
         try:
@@ -101,7 +94,7 @@ class StoryManager:
 
         try:
             response = ollama.generate(
-                model="llama3",
+                model="llama2",
                 prompt=prompt,
                 options={"temperature": 0.7}
             )

@@ -31,6 +31,11 @@ def init_scraper():
 def study_session():
     """Handle study session logging"""
     try:
+        # data = {
+        #     "user_id": "test_user",
+        #     "planned_duration": 30,
+        #     "actual_duration": 35
+        # }
         data = request.json
         user_id = data.get("user_id", "default")
         planned = data.get("planned_duration", 30)
@@ -48,5 +53,6 @@ def study_session():
         return jsonify({"success": False, "error": str(e)}), 400
 
 if __name__ == "__main__":
+    #study_session()
     DATA_DIR.mkdir(exist_ok=True)
     app.run(debug=True)

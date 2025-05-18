@@ -30,3 +30,4 @@ yarn-error.log*
 Frontend/node_modules/*
 Backend/__pycache__/*
 Backend/scraper/__pycache__/*
+Backend/services/__pycache__/*
