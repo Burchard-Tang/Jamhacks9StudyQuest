@@ -1,0 +1,94 @@
+.frontpage {
+  background-color: #FDF6E3;
+  background-image: url('../../public/Images/fantasy background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Georgia', serif;
+  color: #3B2F2F;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.frontpage-content {
+  background-color: rgba(253, 246, 227, 0.95); /* parchment feel */
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
+  text-align: center;
+  position: relative;
+}
+
+.logo {
+  max-width: 100px;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: #D65A31;
+  text-shadow: 1px 1px 0 #8C7B6B;
+}
+
+.slogan {
+  font-size: 1.2rem;
+  color: #8C7B6B;
+  margin-bottom: 1.5rem;
+}
+
+.description {
+  background-color: #fdf2dc;
+  border-left: 5px solid #D65A31;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  border-radius: 10px;
+  color: #3B2F2F;
+}
+
+.start-button {
+  background-color: #D65A31;
+  color: #FDF6E3;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.start-button:hover {
+  background-color: #b24a28;
+}
+
+.chapter-progress {
+  margin-top: 2rem;
+}
+
+.chapter-marker {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #6AA84F;
+  margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+  background-color: #e5d8bc;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 10px;
+  width: 100%;
+}
+
+.progress-fill {
+  background-color: #6AA84F;
+  height: 100%;
+  transition: width 0.4s ease;
+}

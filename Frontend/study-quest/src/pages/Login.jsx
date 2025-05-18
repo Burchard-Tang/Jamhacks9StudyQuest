@@ -23,15 +23,19 @@ const Login = () => {
 
         try {
             const res = await axios.post("http://localhost:8081/verifyuser", {
-                name: username,
+                username,
                 password,
             });
 
             if (res.data.success) {
                 storeUser(res.data.user);
+                // Store study sessions if present
+                if (Array.isArray(res.data.sessions)) {
+                    localStorage.setItem("studySessions", JSON.stringify(res.data.sessions));
+                }
                 setUsername("");
                 setPassword("");
-                navigate("/dashboard");
+                navigate("/app/dashboard");
             } else {
                 setError("Invalid username or password.");
             }
@@ -56,7 +60,7 @@ const Login = () => {
 
         try {
             const res = await axios.put("http://localhost:8081/create", {
-                name: username,
+                username,
                 password,
             });
 
@@ -65,7 +69,7 @@ const Login = () => {
                 setUsername("");
                 setPassword("");
                 setConfirmPassword("");
-                navigate("/dashboard");
+                navigate("/app/dashboard");
             } else {
                 setError("Signup failed. Username may already exist.");
             }
@@ -78,57 +82,59 @@ const Login = () => {
     };
 
     return (
-        <div className="auth-container">
-            <h2>{loginOrSignup ? "Login" : "Sign Up"}</h2>
-            <form
-                onSubmit={loginOrSignup ? handleLogin : handleSignup}
-                className="auth-form"
-            >
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                {!loginOrSignup && (
+        <div className="auth-page">
+            <div className="auth-box">
+                <h2 className="auth-title">{loginOrSignup ? "Login" : "Sign Up"}</h2>
+                <form
+                    onSubmit={loginOrSignup ? handleLogin : handleSignup}
+                    className="auth-form"
+                >
                     <input
-                        type="password"
-                        placeholder="Re-enter Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
-                )}
-                <button type="submit" disabled={loading}>
-                    {loading
-                        ? "Please wait..."
-                        : loginOrSignup
-                        ? "Login"
-                        : "Sign Up"}
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    {!loginOrSignup && (
+                        <input
+                            type="password"
+                            placeholder="Re-enter Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    )}
+                    <button type="submit" className="auth-button" disabled={loading}>
+                        {loading
+                            ? "Please wait..."
+                            : loginOrSignup
+                            ? "Login"
+                            : "Sign Up"}
+                    </button>
+                    {error && <p className="auth-error">{error}</p>}
+                </form>
+                <button
+                    className="auth-toggle"
+                    onClick={() => {
+                        setLoginOrSignup(!loginOrSignup);
+                        setError("");
+                        setPassword("");
+                        setConfirmPassword("");
+                    }}
+                >
+                    {loginOrSignup
+                        ? "Need an account? Sign Up"
+                        : "Already have an account? Login"}
                 </button>
-                {error && <p className="error-message">{error}</p>}
-            </form>
-            <button
-                className="switch-button"
-                onClick={() => {
-                    setLoginOrSignup(!loginOrSignup);
-                    setError("");
-                    setPassword("");
-                    setConfirmPassword("");
-                }}
-            >
-                {loginOrSignup
-                    ? "Need an account? Sign Up"
-                    : "Already have an account? Login"}
-            </button>
+            </div>
         </div>
     );
 };

@@ -1,0 +1,15 @@
+{
+  "university": "uwaterloo",
+  "story_arc": [
+    "You've just arrived at university. Your journey begins...",
+    "Session update: Completed study session."
+  ],
+  "stats": {
+    "streak": 1,
+    "gpa": 4.0,
+    "term": 1,
+    "failed_sessions": 0
+  },
+  "created_at": "2025-05-17T20:47:42.042388",
+  "last_updated": "2025-05-17T20:47:42.044897"
+}
