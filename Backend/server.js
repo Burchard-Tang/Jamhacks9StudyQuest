@@ -260,3 +260,24 @@ app.get('/studysessions/:userId', (req, res) => {
 app.listen(8081, () => {
     console.log("Server listening on port 8081");
 });
+
+
+app.get('/files', (req, res) => {
+  const categories = ['documents', 'images', 'others'];
+  let allFiles = [];
+
+  categories.forEach(category => {
+    const dirPath = path.join(__dirname, 'uploads', category);
+    if (fs.existsSync(dirPath)) {
+      const files = fs.readdirSync(dirPath).map(file => ({
+        name: file.split('-').slice(1).join('-'), // Remove timestamp from filename
+        path: `/uploads/${category}/${file}`,
+        category,
+        uploadedAt: fs.statSync(path.join(dirPath, file)).birthtime
+      }));
+      allFiles = [...allFiles, ...files];
+    }
+  });
+
+  res.json(allFiles);
+});
