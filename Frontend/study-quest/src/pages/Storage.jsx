@@ -105,7 +105,7 @@ const Storage = () => {
         {
           model: "mistral",
           prompt: `Create exactly 5 high-quality flashcards from this study material as a json list.
-          Format each as JSON objects with "question" and "answer" keys with string values.
+          Format each as JSON objects with "question" and "answer" keys with string values.   Example format: [{"question": "What is...", "answer": "It is..."}, {...}]
           Return ONLY a valid JSON array of exactly 5 flashcards.
           Study material: ${text.substring(0, 2000)}`,
           stream: false,
@@ -185,8 +185,8 @@ const Storage = () => {
 
     setProcessingFile(fileId);
     setErrorMessage('');
-    try {
-      const text = await extractTextFromFile(file);
+  try {
+    const text = await extractTextFromFile(file);
     if (!text || text.trim().length === 0) {
       throw new Error("Could not extract any text from the file");
     }
@@ -199,11 +199,10 @@ const Storage = () => {
     console.error("Processing error:", error);
   } finally {
     setProcessingFile(null);
-    }
-  };
-
-   /**
-   * Handles text extraction from non-text files (images/PDFs) */
+  }
+};
+ /**
+ * Handles text extraction from non-text files (images/PDFs) */
 
   const handleTextRecognition = async (fileId) => {
     const file = fileObjects[fileId];
@@ -550,4 +549,4 @@ const Storage = () => {
   );
 };
 
-export default Storage;
+export default Storage ; 
