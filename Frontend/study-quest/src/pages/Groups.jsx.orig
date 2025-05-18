@@ -166,6 +166,7 @@ const Groups = () => {
                             <p><strong>Group ID:</strong> {groupData.group_id}</p>
                         </div>
                     )}
+<<<<<<< HEAD
                     <div className="groups-section">
                         <h2>Group Members (ordered by University Tier)</h2>
                         <table className="groups-table">
@@ -174,6 +175,29 @@ const Groups = () => {
                                     <th>Rank</th>
                                     <th>Username</th>
                                     <th>University Tier</th>
+=======
+                    <h2>Group Members (ordered by University Tier)</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Username</th>
+                                <th>University Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {groupMembers.map((member, idx) => (
+                                <tr key={member.user_id}>
+                                    <td>{idx + 1}</td>
+                                    <td>{member.username}</td>
+                                    <td>
+                                        {universityTiers[
+                                            member.current_university
+                                                ? member.current_university
+                                                : 0
+                                        ] || member.current_university}
+                                    </td>
+>>>>>>> BurchardBranch
                                 </tr>
                             </thead>
                             <tbody>
@@ -182,7 +206,8 @@ const Groups = () => {
                                         <td>{idx + 1}</td>
                                         <td>{member.username}</td>
                                         <td>
-                                        {universityTiers[Math.min(Math.max(member.current_university ? member.current_university : 0, 0), universityTiers.length-1)] || member.current_university}
+                                            {universityTiers[(member.current_university ?? 1) - 1] ||
+                                                member.current_university}
                                         </td>
                                     </tr>
                                 ))}

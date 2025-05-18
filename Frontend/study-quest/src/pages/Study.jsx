@@ -1,12 +1,16 @@
 // src/pages/Study.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import './study.css';  // <-- import the styles here
+import axios from 'axios';
 
 const Study = () => {
-  const [desiredTime, setDesiredTime] = useState(0); // in seconds
+  const [desiredTime, setDesiredTime] = useState(""); 
   const [isStudying, setIsStudying] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [sessionResult, setSessionResult] = useState(null);
   const [latestStory, setLatestStory] = useState(null);
+  const [inputTouched, setInputTouched] = useState(false);
+  const [sessionStart, setSessionStart] = useState(null);
 
   const timerRef = useRef(null);
   const focusLostRef = useRef(false);
@@ -22,60 +26,128 @@ const Study = () => {
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [isStudying]);
 
-  const startStudySession = () => {
-    setIsStudying(true);
-    setElapsedTime(0);
-    focusLostRef.current = false;
-    timerRef.current = setInterval(() => {
-      setElapsedTime((prev) => prev + 1);
-    }, 1000);
+const startStudySession = () => {
+  const timeInSeconds = Number(desiredTime) * 60;
+  if (isNaN(timeInSeconds) || timeInSeconds <= 0) return;
+
+  setIsStudying(true);
+  setElapsedTime(0);
+  setSessionStart(new Date()); // Save start time
+  focusLostRef.current = false;
+  timerRef.current = setInterval(() => {
+    setElapsedTime((prev) => prev + 1);
+  }, 1000);
+};
+
+  const handlePerformanceUpdate = async (performance) => {
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const universityTiers = [
+      'Deferred to geomatics', // highest/best
+      'Stanford',
+      'MIT',
+      'Harvard',
+      'Waterloo CS',
+      'UofT',
+      'UBC',
+      'McMaster',
+      'Queens',
+      'Toronto Metropolitan',
+      'York',
+      'Seneca',
+      "You're cooked",
+      'Brock Gender Studies', // lowest/worst
+    ];
+    const maxTier = universityTiers.length;
+    let currentUniversity = user.current_university || 6;
+
+    // Lower index is better, so "good" means move toward 1, "bad" means move toward maxTier
+    let newTier = currentUniversity;
+    if (performance === "good") {
+      newTier = Math.max(1, currentUniversity - 1);
+    } else if (performance === "bad") {
+      newTier = Math.min(maxTier, currentUniversity + 1);
+    }
+
+    // Update localStorage first
+    localStorage.setItem("user", JSON.stringify({ ...user, current_university: newTier }));
+
+    // Update backend (SQL database) with correct types
+    if (user.user_id) {
+      try {
+        await axios.put("http://localhost:8081/update", {
+          userId: Number(user.user_id),
+          currentUniversity: Number(newTier),
+        });
+      } catch (e) {
+        // Optionally handle error
+        console.error("Failed to update university in backend", e);
+      }
+    }
   };
 
-  const stopStudySession = (message = null) => {
+  const stopStudySession = async (message = null) => {
     setIsStudying(false);
     clearInterval(timerRef.current);
 
-    let performance = "average";
+  const desiredTimeSeconds = Number(desiredTime) * 60;
+  let performance = "average";
     const ratio = elapsedTime / desiredTime;
     if (ratio >= 0.9) performance = "good";
     else if (ratio < 0.5) performance = "bad";
 
+    // Save session to backend
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    if (user.user_id && sessionStart) {
+      try {
+        await axios.post("http://localhost:8081/studysession", {
+          user_id: user.user_id,
+          start_time: sessionStart.toISOString().slice(0, 19).replace('T', ' '),
+          end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          focus_score: ratio >= 0.9 ? 2 : ratio < 0.5 ? 0 : 1,
+          content: message ? message : generateStory(performance),
+        });
+      } catch (e) {
+        // Optionally handle error
+        console.error("Failed to save study session", e);
+      }
+    }
+    
     if (message) {
       setSessionResult(message);
     } else {
+      await handlePerformanceUpdate(performance);
       const newStoryText = generateStory(performance);
       const newChapter = {
         text: newStoryText,
         success: performance === "good"
       };
 
-      // Save to localStorage
-      const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
+          const existingChapters = JSON.parse(localStorage.getItem("studyChapters")) || [];
       const updatedChapters = [...existingChapters, newChapter];
-      localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
+    localStorage.setItem("studyChapters", JSON.stringify(updatedChapters));
 
-      setLatestStory(newStoryText);
-      setSessionResult(`Study session complete! (${performance})`);
-    }
-  };
+    setLatestStory(newStoryText);
+    setSessionResult(`Study session complete! (${performance})`);
+  }
+};
 
   const generateStory = (performance) => {
+    // Update stories to reflect the new ranking direction
     const good = [
-      "You aced the exam and earned a prestigious scholarship!",
-      "You impressed the admissions team and boosted your portfolio!",
-      "Your research project won an academic award!"
+      "You worked so hard you got deferred to geomatics! (That's a good thing!)",
+      "You impressed everyone and moved up a tier!",
+      "Your dedication is unmatched—you're climbing to the top!"
     ];
     const average = [
-      "You completed your work and stayed on track.",
-      "You kept pace with your peers, but nothing big happened.",
-      "You got through the day with minor achievements."
+      "You held your ground, but didn't move up or down.",
+      "You stayed steady in your university journey.",
+      "Nothing changed, but you kept at it."
     ];
     const bad = [
-      "You missed your goals and fell behind.",
-      "You got distracted and forgot a major assignment.",
-      "Your study session was wasted on scrolling memes."
+      "You slacked off and slipped closer to Brock Gender Studies.",
+      "You lost focus and dropped a tier.",
+      "Your study session was rough—watch out for the bottom!"
     ];
-
     const options = performance === 'good' ? good : performance === 'bad' ? bad : average;
     return options[Math.floor(Math.random() * options.length)];
   };
@@ -85,21 +157,26 @@ const Study = () => {
       <h2>Study Session</h2>
 
       <div>
-        <label>Set Study Goal (minutes): </label>
-        <input
-          type="number"
-          value={desiredTime / 60}
-          onChange={(e) => setDesiredTime(Number(e.target.value) * 60)}
-          disabled={isStudying}
+        <label>Set Study Goal (minutes):</label>
+       <input
+            type="number"
+            placeholder="Enter minutes..."
+            value={desiredTime}
+            onChange={(e) => setDesiredTime(e.target.value)}
+            disabled={isStudying}
         />
+
       </div>
 
       {!isStudying ? (
-        <button onClick={startStudySession} disabled={desiredTime <= 0}>
-          Start Studying
-        </button>
+        <button onClick={startStudySession} disabled={Number(desiredTime) <= 0}>
+  Start Studying
+</button>
+
       ) : (
-        <button onClick={() => stopStudySession()}>End Session</button>
+        <button onClick={() => stopStudySession()}>
+          End Session
+        </button>
       )}
 
       <div>
